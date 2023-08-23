@@ -18,9 +18,9 @@ public class SimulationManager : MonoBehaviour
     {
         battleID = PlayerPrefs.GetInt("map");
 
-        map[0].SetActive(true);
-        allies[0].SetActive(true);
-        enemies[0].SetActive(true);
+        map[battleID].SetActive(true);
+        allies[battleID].SetActive(true);
+        enemies[battleID].SetActive(true);
 
     }
 }

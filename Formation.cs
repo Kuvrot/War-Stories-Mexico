@@ -54,6 +54,8 @@ public class Formation : MonoBehaviour
 
     public List<SoldierController> men;
 
+    public List<SoldierController> deadMen;
+
     //components
     NavMeshAgent _nva;
     AudioSource audioSource;
@@ -193,6 +195,9 @@ public class Formation : MonoBehaviour
 
                         }
 
+                    }else
+                    {
+                        state = 1;
                     }
                 }
                 else {
@@ -291,6 +296,7 @@ public class Formation : MonoBehaviour
                     _nva.isStopped = false;
 
                 }
+            
             }
             else {
 
@@ -429,6 +435,9 @@ public class Formation : MonoBehaviour
                             Shoot(Distance);
                         }
 
+                    }else
+                    {
+                        state = 1;
                     }
                 }        
             }
@@ -477,6 +486,7 @@ public class Formation : MonoBehaviour
             isFacingTarget = false;
             transform.rotation = Quaternion.RotateTowards(transform.rotation, rotacionObjetivo, _nva.angularSpeed * Time.deltaTime);
         }
+        
 
         return isFacingTarget;
 
@@ -502,9 +512,9 @@ public class Formation : MonoBehaviour
 
     void Shoot(float distance)
     {
-        timer = 0;
+        
        
-        Debug.Log("shoot");
+        //Debug.Log("shoot");
 
         if (ID == 0)
         {
@@ -517,6 +527,7 @@ public class Formation : MonoBehaviour
                     if (!unitVision.crossfire)
                     {
                         audioSource.PlayOneShot(formationSounds.Shooting);
+                        Instantiate(gm.shootingParticle, transform.position, transform.rotation);
 
                         canShoot = false;
                         StartCoroutine(Shooting());
@@ -525,26 +536,52 @@ public class Formation : MonoBehaviour
                         if (!artillery)
                         {
 
-                            if (distance <= 25)
+
+                            if (shootTarget.GetComponent<Formation>().ID == 0)
                             {
-                                shootTarget.GetComponent<Formation>().GetDamage(((Health * damage) / men.Count) * 4);
+                                if (distance <= 25)
+                                {
+                                    shootTarget.GetComponent<Formation>().GetDamage(((Health * damage) / men.Count) * 4);
+                                }
+                                else
+                                {
+                                    shootTarget.GetComponent<Formation>().GetDamage((Health * damage) / men.Count);
+                                }
                             }
-                            else
+                            else if (shootTarget.GetComponent<Formation>().ID == 3)
                             {
-                                shootTarget.GetComponent<Formation>().GetDamage((Health * damage) / men.Count);
+                                if (distance >= 25)
+                                {
+                                    shootTarget.GetComponent<Formation>().GetDamage(Random.Range(0,3));
+                                }
+                                else
+                                {
+                                    shootTarget.GetComponent<Formation>().GetDamage(((Health * damage) / men.Count) * 4);
+                                }
                             }
+
+                            
                         }
                         else {
 
-                            if (Random.Range(0, 100) < 33) {
+                            if (Random.Range(0, 100) < 33)
+                            {
 
-                                shootTarget.GetComponent<Formation>().GetDamage(damage);
+                                shootTarget.GetComponent<Formation>().GetDamage(damage * 3);
+                                Instantiate(gm.explosionParticle, shootTarget.position, shootTarget.rotation);
+
+                            }
+                            else {
+                                int ran = Random.Range(0 , 20);
+                                Instantiate(gm.explosionParticle, new Vector3 (shootTarget.position.x + ran, shootTarget.position.y , shootTarget.position.z + ran), shootTarget.rotation);
 
                             }
 
                         }
+
+                        timer = 0;
                     }
-                   // Debug.Log("Shooting");
+                   // //Debug.Log("Shooting");
                 }
                 else
                 {
@@ -552,7 +589,8 @@ public class Formation : MonoBehaviour
                     state = 0;
 
                 }
-            }       
+            }  
+            
         }
         else if (ID == 1)
         {
@@ -560,7 +598,12 @@ public class Formation : MonoBehaviour
 
                 Formation target_formation = shootTarget.GetComponent<Formation>();
 
-                target_formation.GetDamage((Health * damage) / men.Count);
+                if (men.Count != 0)
+                {
+
+                    target_formation.GetDamage((Health * damage) / men.Count);
+
+                }
 
                 StartCoroutine(Melee());
                 if (!shootTarget.GetComponent<Formation>().gettingAttack && shootTarget.GetComponent<Formation>().isAI)
@@ -575,6 +618,8 @@ public class Formation : MonoBehaviour
                 canMelee = false;
             }
 
+            timer = 0;
+
         }
          else if (ID == 3)
         {
@@ -586,7 +631,7 @@ public class Formation : MonoBehaviour
                 if (shootTarget.GetComponent<Formation>().ID != 3)
                 {
                     shootTarget.GetComponent<Formation>().GetDamage(Random.Range(damage / 2 , damage + 1) / men.Count);
-                    Debug.Log("Cavalry_Attack");
+                    //Debug.Log("Cavalry_Attack");
                     //canMelee = false;
                     if (!shootTarget.GetComponent<Formation>().gettingAttack && shootTarget.GetComponent<Formation>().isAI)
                     {
@@ -600,9 +645,9 @@ public class Formation : MonoBehaviour
                 }
                 else
                 {
-
                     shootTarget.GetComponent<Formation>().GetDamage(damage / 4);
-                    Debug.Log("Cavalry_Attack");
+
+                    //Debug.Log("Cavalry_Attack");
                     //canMelee = false;
                     if (!shootTarget.GetComponent<Formation>().gettingAttack && shootTarget.GetComponent<Formation>().isAI)
                     {
@@ -615,6 +660,7 @@ public class Formation : MonoBehaviour
                 }
 
                 meleeCounter = 0;
+                timer = 0;
                 canMelee = false;
             }
         }
@@ -626,7 +672,7 @@ public class Formation : MonoBehaviour
         int curID = ID;
 
         reloading = true;
-        Debug.Log("Reloading");
+        //Debug.Log("Reloading");
         yield return new WaitForSeconds(2.5f);
         state = 3;
 
@@ -646,7 +692,7 @@ public class Formation : MonoBehaviour
         int curID = ID;
 
         reloading = true;
-        Debug.Log("Reloading");
+        //Debug.Log("Reloading");
         yield return new WaitForSeconds(2.5f);
         state = 3;
 
@@ -690,14 +736,9 @@ public class Formation : MonoBehaviour
                 {
                     men[r].Death();
 
-                    if (ID == 3)
-                    {
-
-                        men[r].gameObject.SetActive(false);
-
-                    }
-
+                    deadMen.Add(men[r]);
                     men.Remove(men[r]);
+                    
                 }
 
             }

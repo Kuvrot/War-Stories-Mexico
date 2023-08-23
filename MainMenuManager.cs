@@ -46,13 +46,24 @@ public class MainMenuManager : MonoBehaviour
         PlayerPrefs.SetInt("map", ID);
         SceneManager.LoadScene("LoadingScreen");
         
-
     }
 
     public void DemoBattle () {
 
+        StartCoroutine(timer());
+        
 
-        SceneManager.LoadScene("SampleScene 1");
+    }
+
+    IEnumerator timer ()
+    {
+
+        yield return new WaitForSeconds(0.2f);
+        PlayerPrefs.SetInt("map", ID);
+        SceneManager.LoadScene("LoadingScreen");
+        Debug.Log("ID is " + ID);
+        StopAllCoroutines();
+
 
     }
 

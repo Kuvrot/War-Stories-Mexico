@@ -1,56 +1,79 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.UI;
 
 public class SoldierController : MonoBehaviour
 {
-
-    Animator anim;
+    [HideInInspector]
+    public Animator anim;
     Formation formation;
-    bool shoot = false;
+    [HideInInspector]
+    public bool shoot = false;
     public bool isDeath;
+    [HideInInspector]
+    public bool init;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
+       formation = GetComponentInParent<Formation>();
         anim = GetComponentInChildren<Animator>();
-        formation = GetComponentInParent<Formation>();
+    }
+
+    private void OnEnable()
+    {
+        init = false; anim.enabled = true;
+        
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-
-        anim.SetInteger("ID", formation.ID);
-
-       if (formation.ID == 0)
+        if (!init)
         {
-            if (!formation.artillery)
+            if (formation.state != 0)
             {
-
-                switch (formation.state)
+                if (!anim.enabled)
                 {
-                    default: anim.SetInteger("Walk", 0); break;
-                    case 1: anim.SetInteger("Walk", 1); break;
-                    case 2: anim.SetTrigger("Shoot"); anim.SetInteger("Walk", 0); break;
-                        //case 3: anim.SetTrigger("Reloading"); shoot = false; break;
-
+                    anim.enabled = true;
                 }
-
-            }
-            else {
-
-                if (formation.state == 2) {
-
-                    anim.SetTrigger("Shoot");
-
-                }
-            
-            
             }
 
+            init = true;
+
+        }
+
+
+        if (formation.state != 0)
+        {
+            shoot = true;
+            anim.enabled = true;
+        }
+        else
+        {
+            shoot = false;
+        }
+
+        if (formation.ID != 2)
+        {
+            anim.SetInteger("ID", formation.ID);
         }else
+        {
+            anim.SetInteger("ID", 0);
+        }
+
+       if (formation.ID == 0 || formation.ID == 2)
+        {
+            switch (formation.state)
+            {
+                default: anim.SetInteger("Walk", 0); break;
+                case 1: anim.SetInteger("Walk", 1); break;
+                case 2: anim.SetTrigger("Shoot"); anim.SetInteger("Walk", 0); break;
+                    //case 3: anim.SetTrigger("Reloading"); shoot = false; break;
+            }
+
+        }
+        else
         {
             switch (formation.state)
             {
@@ -72,6 +95,18 @@ public class SoldierController : MonoBehaviour
         //transform.position -= new Vector3(0 , 0.7f , 0);
         anim.applyRootMotion = true;
         transform.parent = null;
+        StartCoroutine(DisableAnimator());
+    }
+
+    IEnumerator DisableAnimator()
+    {
+        if (!anim.enabled)
+        {
+            anim.enabled = true;
+        }
+        yield return new WaitForSeconds(3);
+        anim.enabled = false;
+
     }
 
 }

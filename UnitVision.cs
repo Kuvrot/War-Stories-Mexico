@@ -9,72 +9,66 @@ public class UnitVision : MonoBehaviour
     public Formation f;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         f = GetComponentInParent<Formation>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (f) {
+        string tag1 = other.GetComponent<Collider>().tag;
+        
+        if (!f.isAI)
+        {
+            
 
-            if (!f.isAI)
+            if (tag1 == "Allied")
             {
 
-                if (other.tag == "Allied")
-                {
-
-                    crossfire = true;
-
-                }
-
-            }
-            else
-            {
-
-                if (other.tag == "Enemy")
-                {
-
-                    crossfire = true;
-
-                }
+                crossfire = true;
 
             }
 
+        }
+        else
+        {
+
+            if (other.tag == "Enemy")
+            {
+
+                crossfire = true;
+
+            }
 
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (f) {
+        string tag1 = other.tag;
+        if (!f.isAI)
+        {
 
-            if (!f.isAI)
+            if (other.tag == "Allied")
             {
 
-                if (other.tag == "Allied")
-                {
-
-                    crossfire = false;
-
-                }
+                crossfire = false;
 
             }
-            else
-            {
-
-                if (other.tag == "Enemy")
-                {
-
-                    crossfire = false;
-
-                }
-
-            }
-
-
 
         }
+        else
+        {
+
+            if (other.tag == "Enemy")
+            {
+
+                crossfire = false;
+
+            }
+
+        }
+
     }
 
 

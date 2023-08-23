@@ -21,6 +21,9 @@ public class GameManager : MonoBehaviour
     public List<GameObject> enemies;
 
 
+    public GameObject shootingParticle;
+    public GameObject explosionParticle;
+
     // Start is called before the first frame update
     void Awake()
     {

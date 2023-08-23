@@ -1,0 +1,3 @@
+combatMode : Modo de combate],
+distance : distancia],
+melee : Combate cuerpo a cuerpo],
