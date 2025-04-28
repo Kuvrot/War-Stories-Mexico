@@ -1,8 +1,6 @@
 # War Stories: Mexico
 # Historias de Guerra: México
 
-![cover_10](https://github.com/Kuvrot/War-Stories-Mexico/assets/23508114/774ec1ed-76de-4a20-ad70-bef6a45180f9)
-
 ## English
 
 It consists of a real-time strategy video game that will recreate the most important battles in Mexico, providing context and historical information so that players can learn in a fun and interactive way about the history of Mexico, in addition to reinforcing their critical thinking to solve problems. problems, since being a strategic game encourages these skills by challenging players to think critically and strategically.
